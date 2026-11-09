@@ -1,17 +1,25 @@
 
+
 import { useState, useEffect, useRef } from "react";
-import "./focusTimer.css";
+import "./FocusTimer.css";
+
+const INITIAL_TIME = 25 * 60;
+
+function getSavedSessions() {
+  try {
+    const saved = localStorage.getItem("sessions");
+    return saved ? Math.max(0, Number(saved) || 0) : 0;
+  } catch {
+    return 0;
+  }
+}
 
 export default function FocusTimer() {
-  const INITIAL_TIME = 25 * 60;
-
   const [timeLeft, setTimeLeft] = useState(INITIAL_TIME);
   const [isRunning, setIsRunning] = useState(false);
   const [message, setMessage] = useState("");
 
-  const [sessions, setSessions] = useState(() => {
-    return Number(localStorage.getItem("sessions")) || 0;
-  });
+  const [sessions, setSessions] = useState(getSavedSessions);
 
   const intervalRef = useRef(null);
 
@@ -50,11 +58,18 @@ export default function FocusTimer() {
     if (!isRunning) return;
 
     intervalRef.current = setInterval(() => {
-      setTimeLeft((previousTime) => previousTime - 1);
+      setTimeLeft((previousTime) => {
+        if (previousTime <= 1) {
+          return 0;
+        }
+
+        return previousTime - 1;
+      });
     }, 1000);
 
     return () => {
       clearInterval(intervalRef.current);
+      intervalRef.current = null;
     };
   }, [isRunning]);
 
@@ -63,14 +78,17 @@ export default function FocusTimer() {
     if (timeLeft === 0 && isRunning) {
       setIsRunning(false);
       setMessage("Time for a break!");
-
-      setSessions((previousSessions) => previousSessions + 1);
+      setSessions((previous) => previous + 1);
     }
   }, [timeLeft, isRunning]);
 
-  // Save sessions in localStorage
+  // Save sessions to localStorage
   useEffect(() => {
-    localStorage.setItem("sessions", sessions);
+    try {
+      localStorage.setItem("sessions", String(sessions));
+    } catch (error) {
+      console.warn("Unable to save sessions:", error);
+    }
   }, [sessions]);
 
   // Update browser tab title
@@ -83,9 +101,13 @@ export default function FocusTimer() {
   }, [timeLeft]);
 
   return (
-    <div className="timer-container">
+    <main className="timer-container">
 
       <h1>Focus Timer</h1>
+
+      <p className="timer-subtitle">
+        Stay focused. One task at a time.
+      </p>
 
       <div className="timer-display">
         {formatTime(timeLeft)}
@@ -113,14 +135,15 @@ export default function FocusTimer() {
 
       </div>
 
-      <p className="timer-message">
+      <p className="timer-message" aria-live="polite">
         {message}
       </p>
 
-      <h3>
-        Sessions completed: {sessions}
-      </h3>
+      <div className="session-counter">
+        <h3>Sessions completed</h3>
+        <span>{sessions}</span>
+      </div>
 
-    </div>
+    </main>
   );
 }
