@@ -1,0 +1,57 @@
+.timer-container {
+  max-width: 450px;
+  margin: 80px auto;
+  padding: 35px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.timer-container h1 {
+  color: #222;
+  margin-bottom: 25px;
+}
+
+.timer-display {
+  font-size: 65px;
+  font-weight: bold;
+  color: #73AB7C;
+  margin: 25px 0;
+}
+
+.timer-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.timer-buttons button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 8px;
+  background: #BDB76B;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.timer-buttons button:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+
+.timer-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.timer-message {
+  color: #BDB76B;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.timer-container h3 {
+  color: #444;
+  margin-top: 25px;
+}
